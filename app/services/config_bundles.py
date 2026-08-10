@@ -774,15 +774,15 @@ def parse_bundle(
     actual_bundle_hash = hashlib.sha256(_canonical_json(document)).hexdigest()
     if expected.get("bundle.json") != actual_bundle_hash:
         raise BundleSecurityError("Контрольная сумма bundle.json не совпадает")
-    for path, payload in files.items():
-        if expected.get(path) != hashlib.sha256(payload).hexdigest():
-            raise BundleSecurityError(f"Контрольная сумма файла {path} не совпадает")
     unexpected = set(expected) - ({"bundle.json"} | set(files))
     if unexpected:
         raise BundleSecurityError("В архиве отсутствуют заявленные файлы")
     extra = set(files) - set(expected)
     if extra:
         raise BundleSecurityError("Архив содержит незаявленные файлы")
+    for path, payload in files.items():
+        if expected.get(path) != hashlib.sha256(payload).hexdigest():
+            raise BundleSecurityError(f"Контрольная сумма файла {path} не совпадает")
     document["entities"] = _validate_document_shape(document)
     return document, files, manifest, signature_envelope
 

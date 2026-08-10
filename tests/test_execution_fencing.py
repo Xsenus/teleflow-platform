@@ -438,6 +438,97 @@ def test_failover_requires_independent_approval_and_advances_epoch(
         admin.close()
 
 
+def test_execution_lists_and_failover_cancellation(auth_client: TestClient) -> None:
+    """Проверить списки execution и безопасную отмену открытого failover-запроса."""
+    _register_standby(auth_client)
+
+    sites = auth_client.get("/api/v1/execution/sites")
+    assert sites.status_code == 200, sites.text
+    assert {item["site_key"] for item in sites.json()} == {"primary", "standby"}
+    assert sum(bool(item["is_active_site"]) for item in sites.json()) == 1
+
+    created = auth_client.post(
+        "/api/v1/execution/failovers",
+        headers=csrf_headers(auth_client),
+        json={
+            "target_site_key": "standby",
+            "reason": "Проверка отмены переключения резервной площадки",
+        },
+    )
+    assert created.status_code == 201, created.text
+    request_id = created.json()["id"]
+
+    listed = auth_client.get("/api/v1/execution/failovers?limit=1")
+    assert listed.status_code == 200, listed.text
+    assert [item["id"] for item in listed.json()] == [request_id]
+
+    cancelled = auth_client.post(
+        f"/api/v1/execution/failovers/{request_id}/cancel",
+        headers=csrf_headers(auth_client),
+    )
+    assert cancelled.status_code == 200, cancelled.text
+    assert cancelled.json()["status"] == FailoverRequestStatus.CANCELLED.value
+
+    overview = auth_client.get("/api/v1/execution/overview")
+    assert overview.status_code == 200, overview.text
+    assert overview.json()["lease"]["status"] == ExecutionLeaseStatus.ACTIVE.value
+    assert overview.json()["open_failover"] is None
+
+    repeated = auth_client.post(
+        f"/api/v1/execution/failovers/{request_id}/cancel",
+        headers=csrf_headers(auth_client),
+    )
+    assert repeated.status_code == 409
+    missing = auth_client.post(
+        "/api/v1/execution/failovers/missing-request/cancel",
+        headers=csrf_headers(auth_client),
+    )
+    assert missing.status_code == 409
+
+
+def test_execution_attempt_filter_and_request_conflicts(auth_client: TestClient) -> None:
+    """Проверить фильтрацию попыток доставки и конфликты создания failover-запроса."""
+    _connection, now = prepare_job(auth_client)
+    with auth_client.app.state.session_factory() as db:
+        organization_id = _organization_id(auth_client)
+        job = db.query(DeliveryJob).one()
+        job_id = job.id
+        db.add(
+            DeliveryAttempt(
+                organization_id=organization_id,
+                job_id=job_id,
+                attempt_number=1,
+                worker_id="filter-worker",
+                site_key="primary",
+                fence_epoch=1,
+                status=DeliveryAttemptStatus.PREPARED,
+                prepared_at=now,
+                details={},
+            )
+        )
+        db.commit()
+
+    all_attempts = auth_client.get("/api/v1/execution/delivery-attempts")
+    filtered = auth_client.get(f"/api/v1/execution/delivery-attempts?job_id={job_id}&limit=1")
+    absent = auth_client.get("/api/v1/execution/delivery-attempts?job_id=missing-job")
+    assert all_attempts.status_code == filtered.status_code == absent.status_code == 200
+    assert len(all_attempts.json()) == len(filtered.json()) == 1
+    assert filtered.json()[0]["job_id"] == job_id
+    assert absent.json() == []
+
+    active_target = auth_client.post(
+        "/api/v1/execution/failovers",
+        headers=csrf_headers(auth_client),
+        json={"target_site_key": "primary", "reason": "Площадка уже является активной"},
+    )
+    unknown_target = auth_client.post(
+        "/api/v1/execution/failovers",
+        headers=csrf_headers(auth_client),
+        json={"target_site_key": "unknown", "reason": "Площадка ещё не зарегистрирована"},
+    )
+    assert active_target.status_code == unknown_target.status_code == 409
+
+
 def test_failover_blockers_are_persisted(auth_client: TestClient) -> None:
     """Проверить сценарий failover blockers are persisted. Тест завершается ошибкой при нарушении
     зафиксированного инварианта.

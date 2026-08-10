@@ -452,6 +452,102 @@ def test_signing_key_names_are_trimmed_and_blank_values_rejected(
     assert invalid_patch.status_code == 422, invalid_patch.text
 
 
+def test_signing_key_update_default_filter_and_missing_paths(auth_client: TestClient) -> None:
+    """Проверить редактирование, смену основного ключа, фильтрацию и ответы для чужих идентификаторов."""
+    first = _generate_key(auth_client, name="Первый ключ")
+    second = _generate_key(auth_client, name="Второй ключ")
+
+    updated = auth_client.patch(
+        f"/api/v1/artifact-signing-keys/{first['id']}",
+        headers=csrf_headers(auth_client),
+        json={
+            "name": "  Обновлённый ключ  ",
+            "trusted_for_import": False,
+            "note": "  Проверенная заметка  ",
+        },
+    )
+    assert updated.status_code == 200, updated.text
+    assert updated.json()["name"] == "Обновлённый ключ"
+    assert updated.json()["trusted_for_import"] is False
+    assert updated.json()["note"] == "Проверенная заметка"
+
+    selected = auth_client.post(
+        f"/api/v1/artifact-signing-keys/{first['id']}/default",
+        headers=csrf_headers(auth_client),
+    )
+    assert selected.status_code == 200, selected.text
+    assert selected.json()["is_default"] is True
+    listed = auth_client.get("/api/v1/artifact-signing-keys?include_revoked=false")
+    assert listed.status_code == 200, listed.text
+    defaults = [item["id"] for item in listed.json() if item["is_default"]]
+    assert defaults == [first["id"]]
+    assert {item["id"] for item in listed.json()} == {first["id"], second["id"]}
+
+    revoked = auth_client.post(
+        f"/api/v1/artifact-signing-keys/{second['id']}/revoke",
+        headers=csrf_headers(auth_client),
+        json={"reason": "Проверка фильтрации отозванного ключа"},
+    )
+    assert revoked.status_code == 200, revoked.text
+    active_only = auth_client.get("/api/v1/artifact-signing-keys?include_revoked=false")
+    assert [item["id"] for item in active_only.json()] == [first["id"]]
+    assert (
+        auth_client.patch(
+            f"/api/v1/artifact-signing-keys/{second['id']}",
+            headers=csrf_headers(auth_client),
+            json={"name": "Нельзя изменить"},
+        ).status_code
+        == 409
+    )
+    assert (
+        auth_client.post(
+            f"/api/v1/artifact-signing-keys/{second['id']}/default",
+            headers=csrf_headers(auth_client),
+        ).status_code
+        == 409
+    )
+
+    for method, suffix in (
+        ("get", "/public"),
+        ("patch", ""),
+        ("post", "/default"),
+        ("post", "/revoke"),
+    ):
+        kwargs = {"headers": csrf_headers(auth_client)}
+        if method == "patch":
+            kwargs["json"] = {"name": "Несуществующий ключ"}
+        if suffix == "/revoke":
+            kwargs["json"] = {"reason": "Проверка отсутствующего ключа"}
+        response = getattr(auth_client, method)(
+            f"/api/v1/artifact-signing-keys/missing-key{suffix}", **kwargs
+        )
+        assert response.status_code == 404
+
+
+def test_artifact_inspection_rejects_invalid_and_oversized_uploads(
+    auth_client: TestClient,
+) -> None:
+    """Проверить отказ инспектора для повреждённого и превышающего лимит артефакта."""
+    invalid = auth_client.post(
+        "/api/v1/artifact-signing-keys/verify-artifact",
+        headers=csrf_headers(auth_client),
+        files={"file": ("broken.bin", b"not-an-artifact", "application/octet-stream")},
+    )
+    assert invalid.status_code == 422, invalid.text
+
+    old_limit = auth_client.app.state.settings.max_export_bytes
+    auth_client.app.state.settings.max_export_bytes = 4
+    try:
+        oversized = auth_client.post(
+            "/api/v1/artifact-signing-keys/verify-artifact",
+            headers=csrf_headers(auth_client),
+            files={"file": ("large.bin", b"12345", "application/octet-stream")},
+        )
+        assert oversized.status_code == 413, oversized.text
+    finally:
+        auth_client.app.state.settings.max_export_bytes = old_limit
+
+
 def test_acceptance_report_manifest_metadata_is_verified(
     auth_client: TestClient,
 ) -> None:

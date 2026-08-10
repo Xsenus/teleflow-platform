@@ -162,7 +162,8 @@ run_test_group pilot2 \
   tests/test_pilot_certification.py \
   tests/test_pilot_canary_errors.py
 run_test_group commissioning \
-  tests/test_commissioning_portability.py
+  tests/test_commissioning_portability.py \
+  tests/test_config_bundle_security.py
 run_test_group artifact \
   tests/test_artifact_trust.py
 run_test_group recovery \
