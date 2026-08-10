@@ -688,8 +688,6 @@ def parse_bundle(
                 raise BundleSecurityError("Символические ссылки в архиве запрещены")
             if info.is_dir():
                 continue
-            if name in files:
-                raise BundleSecurityError(f"Архив содержит повторяющийся путь: {name}")
             total += info.file_size
             if total > settings.max_export_bytes:
                 raise BundleSecurityError("Распакованный архив превышает допустимый размер")

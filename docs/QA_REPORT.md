@@ -9,22 +9,22 @@ Alembic head: `bd5f7a9c3e6f`
 ## Итог актуального дерева
 
 ```text
-Собрано тестов:              511
-Пройдено:                    509
+Собрано тестов:              536
+Пройдено:                    534
 Ожидаемо пропущено:            2 (Unix-only на Windows)
 Упало:                       0
-Функциональных модулей:      59
-Statements:                  18 002
-Missed statements:           1 804
-Statement coverage:          89,98%
+Функциональных модулей:      60
+Statements:                  18 000
+Missed statements:           1 672
+Statement coverage:          90,71%
 Обязательный gate:           80%
-Полный прогон:               455,7 секунды baseline + 59 supply-chain тестов отдельно
-Coverage-прогон:             проверенная базовая матрица + 378,3 секунды новых ветвей
+Полный прогон:               263,3 секунды + отдельная manifest-проверка
+Coverage-прогон:             проверенная базовая матрица + 456,8 секунды новых ветвей
 ```
 
-Последний общий baseline подтвердил 465 passed и 2 ожидаемых Windows skip. Дополнительные 44
-supply-chain edge-теста и все 15 прежних supply-chain API-тестов выполнены совместно без падений;
-полный прогон расширенного дерева запланирован после следующего config-bundle пакета.
+Основной прогон расширенного дерева подтвердил 533 passed и 2 ожидаемых Windows skip при
+единственной временно исключённой manifest-проверке. После обновления отчётов и штатной
+регенерации `MANIFEST.sha256` отдельная проверка довела итог до 534 passed и 2 skipped.
 Coverage объединён из ранее проверенной полной матрицы и изолированных coverage-сессий новых
 API-ветвей; полное функциональное выполнение текущего дерева отдельно проверило teardown.
 Release-QA запускает 21 изолированный coverage-shard и заново строит итоговый файл в Linux CI.
@@ -33,7 +33,7 @@ Release-QA запускает 21 изолированный coverage-shard и з
 Это сохраняет полную изоляцию данных и production-путь `create_all`, но исключает повторное
 создание схемы и Argon2 bootstrap-владельца. Время полного Windows-прогона уменьшилось с
 802 до 363,3 секунды (примерно на 55%) на предыдущем монолитном baseline. Текущее расширенное
-дерево без отдельно проверенного manifest-теста завершило Windows-прогон за 455,7 секунды.
+дерево без отдельно проверенного manifest-теста завершило Windows-прогон за 263,3 секунды.
 Linux release-QA по-прежнему запускает модули и
 coverage-shard изолированно.
 
@@ -42,7 +42,7 @@ coverage-shard изолированно.
 Автоматический quality-gate анализирует Python AST и именованные определения JavaScript:
 
 ```text
-Python functions:            1 694
+Python functions:            1 734
 JavaScript named functions:    156
 Функций без пояснения:           0
 ```
@@ -60,6 +60,11 @@ Supply-chain edge-пакет проверяет строгий контракт 
 grammar и pinning, production-policy, immutable report/policy/SBOM hashes, состояния подписей,
 tenant isolation, transparency sequence/hash/payload binding и change-request release gates.
 `app/services/supply_chain.py` покрыт на 100% statements.
+
+Configuration bundle edge-пакет проверяет ZIP metadata/path/encryption/size, подпись export/import,
+media SHA/antivirus/fail-open/cleanup, все reference maps и безопасные defaults для каждого типа
+импортируемой сущности. Удалена недостижимая повторная duplicate-path проверка; case-insensitive
+защита сохранена. `app/services/config_bundles.py` покрыт на 100% statements.
 
 `tests/test_capacity_backpressure.py` и связанные regression-модули проверяют:
 

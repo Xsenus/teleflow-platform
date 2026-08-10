@@ -169,7 +169,8 @@ run_test_group pilot2 \
 run_test_group commissioning \
   tests/test_commissioning_edges.py \
   tests/test_commissioning_portability.py \
-  tests/test_config_bundle_security.py
+  tests/test_config_bundle_security.py \
+  tests/test_config_bundle_edges.py
 run_test_group artifact \
   tests/test_artifact_trust.py \
   tests/test_artifact_verifier_edges.py
