@@ -186,7 +186,8 @@ run_test_group artifact \
 run_test_group recovery \
   tests/test_recovery_assurance.py \
   tests/test_recovery_api_admin.py \
-  tests/test_operations_recovery_api_edges.py
+  tests/test_operations_recovery_api_edges.py \
+  tests/test_recovery_service_edges.py
 run_test_group security1 \
   tests/test_hardening.py \
   tests/test_multitenancy_integrations.py \
@@ -211,6 +212,7 @@ run_test_group execution \
 run_test_group continuity \
   tests/test_continuity_assurance.py \
   tests/test_continuity_api_edges.py \
+  tests/test_continuity_service_edges.py \
   tests/test_function_documentation.py
 
 # Coverage instrumentation can block while appending to an existing data file
