@@ -136,6 +136,7 @@ run_test_group core \
   tests/test_job_api_edges.py \
   tests/test_outbox_edge_cases.py \
   tests/test_privacy_api_edges.py \
+  tests/test_privacy_service_edges.py \
   tests/test_user_admin_api.py
 run_test_group publisher1 \
   tests/test_campaign_api_edges.py \
@@ -147,7 +148,9 @@ run_test_group publisher2 \
   tests/test_delivery_safety.py \
   tests/test_safety_edges.py
 run_test_group publisher3 \
-  tests/test_destination_bulk.py
+  tests/test_destination_api_edges.py \
+  tests/test_destination_bulk.py \
+  tests/test_destination_bulk_edges.py
 run_test_group publisher4 \
   tests/test_destination_windows.py
 run_test_group finalhardening \
