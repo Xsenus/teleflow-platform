@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.audit import write_audit
@@ -53,17 +54,23 @@ def create_user(
         must_change_password=True,
     )
     db.add(user)
-    db.flush()
-    write_audit(
-        db,
-        action="user.created",
-        actor=owner,
-        entity_type="user",
-        entity_id=user.id,
-        details={"email": user.email, "role": user.role.value},
-        request=request,
-    )
-    db.commit()
+    try:
+        db.flush()
+        write_audit(
+            db,
+            action="user.created",
+            actor=owner,
+            entity_type="user",
+            entity_id=user.id,
+            details={"email": user.email, "role": user.role.value},
+            request=request,
+        )
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=409, detail="Пользователь с таким email уже существует"
+        ) from exc
     db.refresh(user)
     return user
 

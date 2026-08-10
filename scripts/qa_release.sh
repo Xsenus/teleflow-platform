@@ -129,10 +129,14 @@ run_test_group core \
   tests/test_business_client.py \
   tests/test_connection_admin_api.py \
   tests/test_conversation_api.py \
-  tests/test_external_api.py
+  tests/test_external_api.py \
+  tests/test_inbound_edge_cases.py \
+  tests/test_outbox_edge_cases.py \
+  tests/test_user_admin_api.py
 run_test_group publisher1 \
   tests/test_campaign_variants.py \
-  tests/test_config_migrations.py
+  tests/test_config_migrations.py \
+  tests/test_scheduler_occurrences.py
 run_test_group publisher2 \
   tests/test_crypto_totp.py \
   tests/test_delivery_safety.py
@@ -160,7 +164,8 @@ run_test_group commissioning \
 run_test_group artifact \
   tests/test_artifact_trust.py
 run_test_group recovery \
-  tests/test_recovery_assurance.py
+  tests/test_recovery_assurance.py \
+  tests/test_recovery_api_admin.py
 run_test_group security1 \
   tests/test_hardening.py \
   tests/test_multitenancy_integrations.py
@@ -169,6 +174,7 @@ run_test_group security2 \
   tests/test_mtproto_adapter.py \
   tests/test_pwa.py \
   tests/test_rbac_media.py \
+  tests/test_storage_s3.py \
   tests/test_transport_adapters.py \
   tests/test_worker_orchestration.py
 run_test_group operations \
