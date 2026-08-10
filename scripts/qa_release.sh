@@ -157,7 +157,8 @@ run_test_group changes1 \
   tests/test_change_management.py \
   tests/test_release_trust.py
 run_test_group changes2 \
-  tests/test_supply_chain.py
+  tests/test_supply_chain.py \
+  tests/test_supply_chain_edges.py
 run_test_group controlled \
   tests/test_controlled_operations.py
 run_test_group pilot1 \
