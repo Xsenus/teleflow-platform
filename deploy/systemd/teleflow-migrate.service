@@ -1,0 +1,23 @@
+[Unit]
+Description=TeleFlow Platform database migrations
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=teleflow
+Group=teleflow
+WorkingDirectory=/opt/teleflow-platform
+EnvironmentFile=/etc/teleflow-platform.env
+Environment=TELEFLOW_AUTO_CREATE_SCHEMA=false
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/opt/teleflow-platform/.venv/bin/alembic upgrade head
+RemainAfterExit=yes
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,183 @@
+groups:
+  - name: teleflow
+    rules:
+      - alert: TeleFlowApiDown
+        expr: up{job="teleflow-api"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: TeleFlow API недоступен
+          description: Prometheus не может получить /metrics более двух минут.
+
+      - alert: TeleFlowWorkerStale
+        expr: teleflow_worker_heartbeat_age_seconds > 90
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Worker TeleFlow не обновляет heartbeat
+          description: Возраст последнего heartbeat превышает 90 секунд.
+
+      - alert: TeleFlowManualReviewRequired
+        expr: teleflow_queue_depth{queue="delivery",status="waiting_review"} > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: Есть публикации, требующие ручной проверки
+          description: Telegram не подтвердил результат доставки; проверьте целевой чат.
+
+      - alert: TeleFlowOutboxDeadLetters
+        expr: teleflow_queue_depth{queue="outbox",status="dead"} > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Есть необработанные интеграционные события
+          description: Outbox содержит события в статусе dead.
+
+      - alert: TeleFlowInboundFailures
+        expr: teleflow_queue_depth{queue="inbound",status="failed"} > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Ошибки обработки Telegram Business updates
+          description: В очереди входящих обновлений есть failed-записи.
+
+      - alert: TeleFlowSLOBlocked
+        expr: teleflow_slo_latest_assessments{status="blocked"} > 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Операционная SLO-оценка заблокирована
+          description: Хотя бы одна организация имеет последний SLO assessment со статусом blocked.
+
+
+      - alert: TeleFlowSLOAssessmentStale
+        expr: teleflow_slo_stale_assessments > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: SLO-оценка TeleFlow устарела
+          description: Хотя бы одна организация не имеет актуального assessment для текущей SLO policy.
+
+      - alert: TeleFlowErrorBudgetExhausted
+        expr: teleflow_slo_error_budget_max_percent >= 100
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: Error budget TeleFlow исчерпан
+          description: Максимальный расход error budget достиг 100 процентов.
+
+      - alert: TeleFlowCriticalIncidentOpen
+        expr: teleflow_open_incidents{severity="critical"} > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: Открыт критический операционный инцидент
+          description: Публикации и production-изменения могут быть заблокированы SLO policy.
+
+      - alert: TeleFlowExecutionLeaseStale
+        expr: teleflow_execution_stale_leases > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: Execution lease истёк у active worker
+          description: Active worker больше не обновляет epoch lease; проверьте площадку до controlled failover.
+
+      - alert: TeleFlowFailoverPending
+        expr: teleflow_execution_open_failovers > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Переключение active/standby ожидает решения
+          description: Организация остаётся в draining до независимого подтверждения или отмены failover.
+
+      - alert: TeleFlowExecutionAttemptUncertain
+        expr: teleflow_execution_uncertain_attempts > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: Сетевой результат Telegram требует ручной сверки
+          description: Автоматический повтор заблокирован, пока оператор не проверит целевой чат.
+
+      - alert: TeleFlowExecutionSiteOffline
+        expr: teleflow_execution_offline_sites > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Execution site не обновляет heartbeat
+          description: Одна или несколько зарегистрированных площадок недоступны для controlled failover.
+
+      - alert: TeleFlowContinuityEvidenceStale
+        expr: teleflow_continuity_stale_evidence > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Continuity evidence отсутствует или устарело
+          description: Хотя бы одна организация не имеет актуального принятого continuity drill для текущей политики и runtime-конфигурации.
+
+      - alert: TeleFlowContinuityDrillRunning
+        expr: sum(teleflow_continuity_drills{status=~"running|awaiting_failback|awaiting_signoff"}) > 0
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: Continuity drill долго не завершён
+          description: Учение находится в активном или ожидающем операторского решения состоянии более 15 минут.
+
+      - alert: TeleFlowContinuityRTOBreached
+        expr: teleflow_continuity_rto_breaches > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: Превышен допустимый continuity RTO
+          description: Последнее принятое учение хотя бы одной организации превысило RTO, установленный её continuity policy.
+
+      - alert: TeleFlowContinuityBlocked
+        expr: teleflow_continuity_compliance{state="blocked"} > 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: Continuity assurance заблокирован
+          description: Нет совместимой active/standby пары или актуального принятого evidence.
+
+      - alert: TeleFlowCapacityBackpressureActive
+        expr: teleflow_capacity_backpressure_organizations > 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: Capacity backpressure блокирует новые публикации
+          description: Хотя бы одна организация достигла лимита очереди, concurrency, drain time или сетевого бюджета.
+
+      - alert: TeleFlowCapacityAssessmentStale
+        expr: teleflow_capacity_stale_assessments > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Capacity assessment отсутствует или устарел
+          description: Последняя оценка не соответствует текущей capacity policy либо вышла за TTL.
+
+      - alert: TeleFlowCapacityDrainTimeHigh
+        expr: teleflow_capacity_estimated_drain_seconds_max > 21600
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Прогноз обработки очереди превышает шесть часов
+          description: Проверьте размер очереди, интервалы подключений и tenant-level сетевые лимиты.

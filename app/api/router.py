@@ -1,0 +1,76 @@
+from fastapi import APIRouter
+
+from app.api import (
+    analytics,
+    api_keys,
+    artifact_signing,
+    audit_logs,
+    auth,
+    automation,
+    blackouts,
+    business,
+    campaigns,
+    capacity,
+    changes,
+    commissioning,
+    configuration_bundles,
+    connections,
+    continuity,
+    conversations,
+    dashboard,
+    destinations,
+    execution,
+    external,
+    health,
+    integrations,
+    jobs,
+    media,
+    notifications,
+    operations,
+    organization,
+    pilot,
+    pilot_programs,
+    privacy,
+    recovery,
+    release_trust,
+    supply_chain,
+    templates,
+    users,
+)
+
+api_router = APIRouter()
+api_router.include_router(health.router)
+api_router.include_router(auth.router)
+api_router.include_router(users.router)
+api_router.include_router(organization.router)
+api_router.include_router(pilot.router)
+api_router.include_router(commissioning.router)
+api_router.include_router(continuity.router)
+api_router.include_router(pilot_programs.router)
+api_router.include_router(configuration_bundles.router)
+api_router.include_router(dashboard.router)
+api_router.include_router(analytics.router)
+api_router.include_router(connections.router)
+api_router.include_router(business.router)
+api_router.include_router(destinations.router)
+api_router.include_router(media.router)
+api_router.include_router(notifications.router)
+api_router.include_router(operations.router)
+api_router.include_router(execution.router)
+api_router.include_router(templates.router)
+api_router.include_router(campaigns.router)
+api_router.include_router(capacity.router)
+api_router.include_router(changes.router)
+api_router.include_router(jobs.router)
+api_router.include_router(conversations.router)
+api_router.include_router(automation.router)
+api_router.include_router(blackouts.router)
+api_router.include_router(integrations.router)
+api_router.include_router(api_keys.router)
+api_router.include_router(privacy.router)
+api_router.include_router(recovery.router)
+api_router.include_router(release_trust.router)
+api_router.include_router(supply_chain.router)
+api_router.include_router(external.router)
+api_router.include_router(audit_logs.router)
+api_router.include_router(artifact_signing.router)

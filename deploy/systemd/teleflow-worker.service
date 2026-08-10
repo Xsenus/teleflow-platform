@@ -1,0 +1,33 @@
+[Unit]
+Description=TeleFlow Platform scheduler, delivery, inbound and outbox worker
+After=network-online.target postgresql.service redis-server.service teleflow-migrate.service
+Wants=network-online.target
+Requires=teleflow-migrate.service
+
+[Service]
+Type=simple
+User=teleflow
+Group=teleflow
+WorkingDirectory=/opt/teleflow-platform
+EnvironmentFile=/etc/teleflow-platform.env
+Environment=TELEFLOW_AUTO_CREATE_SCHEMA=false
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/opt/teleflow-platform/.venv/bin/python -m app.worker
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=45
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/opt/teleflow-platform/storage /opt/teleflow-platform/data
+LimitNOFILE=65536
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

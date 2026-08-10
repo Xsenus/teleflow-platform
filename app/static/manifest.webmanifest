@@ -1,0 +1,34 @@
+{
+  "name": "TeleFlow Platform",
+  "short_name": "TeleFlow",
+  "description": "Управляемые Telegram-публикации и обработка входящих обращений",
+  "id": "/",
+  "start_url": "/#/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f5f7fb",
+  "theme_color": "#4f46e5",
+  "lang": "ru",
+  "orientation": "any",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

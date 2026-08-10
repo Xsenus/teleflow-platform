@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="TeleFlow Platform — безопасные Telegram-публикации и автоматизация диалогов">
+  <meta name="theme-color" content="#4f46e5">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="TeleFlow">
+  <title>TeleFlow Platform</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div id="root" aria-live="polite">
+    <div class="boot-screen">
+      <div class="brand-mark">TF</div>
+      <div class="spinner" aria-label="Загрузка"></div>
+      <p>Загрузка TeleFlow Platform</p>
+    </div>
+  </div>
+  <div id="toast-container" class="toast-container" aria-live="assertive"></div>
+  <div id="modal-root"></div>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

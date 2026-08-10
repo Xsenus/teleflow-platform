@@ -1,0 +1,29 @@
+name: Предложение функции
+description: Новая возможность или улучшение существующего процесса
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Пользовательская проблема
+      description: Какой сценарий сейчас невозможно или неудобно выполнить?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Желаемый результат
+    validations:
+      required: true
+  - type: textarea
+    id: safety
+    attributes:
+      label: Влияние на безопасность и Telegram-ограничения
+      description: Укажите новые данные, разрешения, сетевые вызовы и возможные злоупотребления.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Рассмотренные альтернативы
