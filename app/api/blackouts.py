@@ -178,7 +178,13 @@ def update_blackout(
     try:
         validated = PublishingBlackoutCreate.model_validate(merged)
     except ValidationError as exc:
-        raise HTTPException(status_code=422, detail=exc.errors()) from exc
+        # Pydantic по умолчанию включает исходные значения и контекст ValueError.
+        # PATCH добавляет туда ORM-datetime, которые Starlette не может
+        # сериализовать в JSON-тело ответа об ошибке.
+        raise HTTPException(
+            status_code=422,
+            detail=exc.errors(include_input=False, include_context=False, include_url=False),
+        ) from exc
     _validate_scope_references(db, organization_id=user.organization_id, payload=validated)
     for key, value in validated.model_dump().items():
         setattr(blackout, key, value)

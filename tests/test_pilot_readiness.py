@@ -384,6 +384,147 @@ def test_blackout_patch_can_switch_window_kind_without_stale_fields(
     assert one_time.json()["end_time"] is None
 
 
+def test_blackout_filters_scope_normalization_and_delete(auth_client: TestClient) -> None:
+    """Проверить фильтры списка, очистку scope-полей и удаление blackout-окна."""
+    connection = create_connection(auth_client)
+    destination = create_destination(auth_client, connection["id"])
+    now = datetime.now(UTC)
+    created = auth_client.post(
+        "/api/v1/blackouts",
+        headers=csrf_headers(auth_client),
+        json={
+            "title": "Окно назначения",
+            "reason": "Проверка нормализации области действия",
+            "scope": "destination",
+            "kind": "one_time",
+            "connection_id": connection["id"],
+            "destination_id": destination["id"],
+            "starts_at": (now + timedelta(hours=1)).isoformat(),
+            "ends_at": (now + timedelta(hours=2)).isoformat(),
+        },
+    )
+    assert created.status_code == 201, created.text
+    blackout_id = created.json()["id"]
+
+    as_connection = auth_client.patch(
+        f"/api/v1/blackouts/{blackout_id}",
+        headers=csrf_headers(auth_client),
+        json={"scope": "connection", "connection_id": connection["id"]},
+    )
+    assert as_connection.status_code == 200, as_connection.text
+    assert as_connection.json()["connection_id"] == connection["id"]
+    assert as_connection.json()["destination_id"] is None
+
+    as_organization = auth_client.patch(
+        f"/api/v1/blackouts/{blackout_id}",
+        headers=csrf_headers(auth_client),
+        json={"scope": "organization", "enabled": False},
+    )
+    assert as_organization.status_code == 200, as_organization.text
+    assert as_organization.json()["connection_id"] is None
+    assert as_organization.json()["destination_id"] is None
+
+    disabled = auth_client.get("/api/v1/blackouts?enabled=false&scope=organization")
+    enabled = auth_client.get("/api/v1/blackouts?enabled=true")
+    assert disabled.status_code == enabled.status_code == 200
+    assert [item["id"] for item in disabled.json()] == [blackout_id]
+    assert enabled.json() == []
+
+    as_destination_without_connection = auth_client.patch(
+        f"/api/v1/blackouts/{blackout_id}",
+        headers=csrf_headers(auth_client),
+        json={"scope": "destination", "destination_id": destination["id"]},
+    )
+    assert as_destination_without_connection.status_code == 200
+    assert as_destination_without_connection.json()["connection_id"] is None
+    assert as_destination_without_connection.json()["destination_id"] == destination["id"]
+
+    deleted = auth_client.delete(
+        f"/api/v1/blackouts/{blackout_id}", headers=csrf_headers(auth_client)
+    )
+    assert deleted.status_code == 200, deleted.text
+    assert auth_client.get("/api/v1/blackouts").json() == []
+    assert (
+        auth_client.delete(
+            f"/api/v1/blackouts/{blackout_id}", headers=csrf_headers(auth_client)
+        ).status_code
+        == 404
+    )
+
+
+def test_blackout_rejects_unknown_and_mismatched_references(auth_client: TestClient) -> None:
+    """Проверить tenant-ссылки blackout и отказ evaluate/PATCH для неверных данных."""
+    first_connection = create_connection(auth_client)
+    second_connection = create_connection(auth_client, name="Second blackout bot")
+    destination = create_destination(auth_client, first_connection["id"])
+    now = datetime.now(UTC)
+    window = {
+        "title": "Проверка ссылок",
+        "reason": "Неверная ссылка должна отклоняться",
+        "kind": "one_time",
+        "starts_at": (now + timedelta(hours=1)).isoformat(),
+        "ends_at": (now + timedelta(hours=2)).isoformat(),
+    }
+
+    unknown_connection = auth_client.post(
+        "/api/v1/blackouts",
+        headers=csrf_headers(auth_client),
+        json={**window, "scope": "connection", "connection_id": "missing-connection"},
+    )
+    unknown_destination = auth_client.post(
+        "/api/v1/blackouts",
+        headers=csrf_headers(auth_client),
+        json={**window, "scope": "destination", "destination_id": "missing-destination"},
+    )
+    mismatch = auth_client.post(
+        "/api/v1/blackouts",
+        headers=csrf_headers(auth_client),
+        json={
+            **window,
+            "scope": "destination",
+            "connection_id": second_connection["id"],
+            "destination_id": destination["id"],
+        },
+    )
+    assert unknown_connection.status_code == unknown_destination.status_code == 404
+    assert mismatch.status_code == 422
+
+    created = auth_client.post(
+        "/api/v1/blackouts",
+        headers=csrf_headers(auth_client),
+        json={**window, "scope": "organization"},
+    )
+    assert created.status_code == 201, created.text
+    invalid_window = auth_client.patch(
+        f"/api/v1/blackouts/{created.json()['id']}",
+        headers=csrf_headers(auth_client),
+        json={"ends_at": (now - timedelta(hours=1)).isoformat()},
+    )
+    assert invalid_window.status_code == 422
+    assert (
+        auth_client.patch(
+            "/api/v1/blackouts/missing-blackout",
+            headers=csrf_headers(auth_client),
+            json={"enabled": False},
+        ).status_code
+        == 404
+    )
+    assert (
+        auth_client.get(
+            "/api/v1/blackouts/evaluate/current",
+            params={"connection_id": "missing-connection"},
+        ).status_code
+        == 404
+    )
+    assert (
+        auth_client.get(
+            "/api/v1/blackouts/evaluate/current",
+            params={"destination_id": "missing-destination"},
+        ).status_code
+        == 404
+    )
+
+
 def test_scheduler_pauses_due_campaign_without_current_readiness(
     auth_client: TestClient,
 ) -> None:

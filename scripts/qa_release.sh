@@ -132,9 +132,12 @@ run_test_group core \
   tests/test_conversation_api.py \
   tests/test_external_api.py \
   tests/test_inbound_edge_cases.py \
+  tests/test_job_api_edges.py \
   tests/test_outbox_edge_cases.py \
+  tests/test_privacy_api_edges.py \
   tests/test_user_admin_api.py
 run_test_group publisher1 \
+  tests/test_campaign_api_edges.py \
   tests/test_campaign_variants.py \
   tests/test_config_migrations.py \
   tests/test_scheduler_occurrences.py
