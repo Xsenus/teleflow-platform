@@ -121,6 +121,7 @@ run_test_group core \
   tests/test_analytics_sessions.py \
   tests/test_antivirus.py \
   tests/test_api_workflow.py \
+  tests/test_ai_service_unit.py \
   tests/test_auth_security.py \
   tests/test_automation_admin_api.py \
   tests/test_automation_flows.py \
@@ -158,7 +159,8 @@ run_test_group controlled \
 run_test_group pilot1 \
   tests/test_pilot_readiness.py
 run_test_group pilot2 \
-  tests/test_pilot_certification.py
+  tests/test_pilot_certification.py \
+  tests/test_pilot_canary_errors.py
 run_test_group commissioning \
   tests/test_commissioning_portability.py
 run_test_group artifact \
@@ -171,6 +173,7 @@ run_test_group security1 \
   tests/test_multitenancy_integrations.py
 run_test_group security2 \
   tests/test_distributed_locks.py \
+  tests/test_logging_and_factory.py \
   tests/test_mtproto_adapter.py \
   tests/test_pwa.py \
   tests/test_rbac_media.py \
