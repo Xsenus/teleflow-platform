@@ -595,21 +595,21 @@ def create_provider(
         created_by_id=user.id,
     )
     db.add(item)
-    db.flush()
-    if payload.api_key:
-        item.api_key_enc = request.app.state.cipher.encrypt(
-            payload.api_key, context=f"ai-provider:{item.id}:api-key"
-        )
-    write_audit(
-        db,
-        actor=user,
-        action="ai.provider_created",
-        entity_type="ai_provider",
-        entity_id=item.id,
-        details={"kind": item.kind.value, "model": item.model_name},
-        request=request,
-    )
     try:
+        db.flush()
+        if payload.api_key:
+            item.api_key_enc = request.app.state.cipher.encrypt(
+                payload.api_key, context=f"ai-provider:{item.id}:api-key"
+            )
+        write_audit(
+            db,
+            actor=user,
+            action="ai.provider_created",
+            entity_type="ai_provider",
+            entity_id=item.id,
+            details={"kind": item.kind.value, "model": item.model_name},
+            request=request,
+        )
         db.commit()
     except IntegrityError as exc:
         db.rollback()

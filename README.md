@@ -560,7 +560,7 @@ TELEFLOW_CLAMAV_TIMEOUT_SECONDS=8
 
 - Python compileall;
 - JavaScript syntax-check основного UI и service worker;
-- 301 тест в 32 функциональных модулях; итоговое statement coverage 80,41% при обязательном `--fail-under=80`;
+- 331 тест в 36 функциональных модулях; итоговое statement coverage 83,22% при обязательном `--fail-under=80`;
 - static release-asset validation: version markers, Compose YAML, JSON, локальные ссылки и запрещённые файлы;
 - `alembic upgrade head`, `alembic check`, downgrade 2.5→2.4 и повторный upgrade;
 - проверку audit chain и dry-run ротации master key;
@@ -573,7 +573,7 @@ TELEFLOW_CLAMAV_TIMEOUT_SECONDS=8
 - execution fencing, durable network-attempt ledger, controlled failover и continuity/failback gates;
 - Ruff, mypy и `pip-audit` dependency gate;
 - проверяемый `MANIFEST.sha256` для текущего Git-дерева;
-- обязательный русскоязычный docstring/JSDoc gate для 1 449 Python- и 156 JavaScript-функций.
+- обязательный русскоязычный docstring/JSDoc gate для 1 477 Python- и 156 JavaScript-функций.
 
 Дополнительно:
 

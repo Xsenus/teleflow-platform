@@ -6,11 +6,13 @@
 - Устранены ошибки строгой типизации; Ruff и mypy добавлены в обязательный CI.
 - Динамические формы получили программные связи label/field, включая повторный render flow builder.
 - Выполнена живая проверка 32 SPA-разделов на desktop, tablet и mobile.
-- Все 1 449 Python- и 156 JavaScript-функций защищены русскоязычным documentation gate.
+- Все 1 477 Python- и 156 JavaScript-функций защищены русскоязычным documentation gate.
 - Тестовые БД клонируются из эталона; полный Windows-прогон ускорен примерно на 62%.
 - Coverage gate повышен с 65% до 80%.
 - Добавлены GitHub issue/PR templates, CodeQL, Windows CI, SHA-pinned Actions и Dependabot.
 - Добавлен детерминированный генератор и verifier `MANIFEST.sha256`.
+- Duplicate provider теперь возвращает управляемый HTTP 409 даже при гонке на database flush.
+- Добавлены lifecycle- и adapter-тесты; coverage production-кода повышен до 83,22%.
 
 ## 2.5.0 — 2026-08-09
 

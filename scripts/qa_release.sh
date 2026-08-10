@@ -122,8 +122,10 @@ run_test_group core \
   tests/test_antivirus.py \
   tests/test_api_workflow.py \
   tests/test_auth_security.py \
+  tests/test_automation_admin_api.py \
   tests/test_automation_flows.py \
-  tests/test_business_automation.py
+  tests/test_business_automation.py \
+  tests/test_conversation_api.py
 run_test_group publisher1 \
   tests/test_campaign_variants.py \
   tests/test_config_migrations.py
@@ -159,8 +161,10 @@ run_test_group security1 \
   tests/test_hardening.py \
   tests/test_multitenancy_integrations.py
 run_test_group security2 \
+  tests/test_distributed_locks.py \
   tests/test_pwa.py \
-  tests/test_rbac_media.py
+  tests/test_rbac_media.py \
+  tests/test_transport_adapters.py
 run_test_group operations \
   tests/test_operations_slo.py
 run_test_group capacity \

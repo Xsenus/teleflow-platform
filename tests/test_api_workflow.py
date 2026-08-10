@@ -248,3 +248,36 @@ def test_campaign_read_supports_safe_editing_and_destination_order(auth_client: 
     )
     assert replaced.status_code == 200, replaced.text
     assert replaced.json()["destination_ids"] == [destination["id"]]
+
+
+def test_template_form_crud_and_revision_lifecycle(auth_client: TestClient) -> None:
+    """Проверить чтение, фильтр, revision, media-validation и удаление шаблона."""
+
+    template = create_template(auth_client)
+    template_id = template["id"]
+    assert auth_client.get(f"/api/v1/templates/{template_id}").status_code == 200
+    active = auth_client.get("/api/v1/templates", params={"active_only": True})
+    assert active.status_code == 200 and active.json()[0]["id"] == template_id
+    missing_media = auth_client.patch(
+        f"/api/v1/templates/{template_id}",
+        headers=csrf_headers(auth_client),
+        json={"media_asset_id": "missing"},
+    )
+    assert missing_media.status_code == 404
+    renamed = auth_client.patch(
+        f"/api/v1/templates/{template_id}",
+        headers=csrf_headers(auth_client),
+        json={"name": "Renamed only"},
+    )
+    assert renamed.status_code == 200 and renamed.json()["revision"] == 1
+    revised = auth_client.patch(
+        f"/api/v1/templates/{template_id}",
+        headers=csrf_headers(auth_client),
+        json={"body": "Новая версия сообщения", "parse_mode": "plain", "link_preview": False},
+    )
+    assert revised.status_code == 200 and revised.json()["revision"] == 2
+    deleted = auth_client.delete(
+        f"/api/v1/templates/{template_id}", headers=csrf_headers(auth_client)
+    )
+    assert deleted.status_code == 200
+    assert auth_client.get(f"/api/v1/templates/{template_id}").status_code == 404

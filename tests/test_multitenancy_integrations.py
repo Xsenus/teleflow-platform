@@ -4,8 +4,8 @@ from datetime import UTC, datetime
 
 from fastapi.testclient import TestClient
 
-from app.enums import OrganizationStatus, UserRole
-from app.models import Organization, User
+from app.enums import OrganizationStatus, OutboxStatus, UserRole
+from app.models import Organization, OutboxEvent, User, utcnow
 from app.security import hash_password
 from tests.conftest import csrf_headers
 from tests.test_api_workflow import create_connection
@@ -127,3 +127,94 @@ def test_ssrf_guards_and_metrics(auth_client: TestClient) -> None:
     assert ready.status_code == 200, ready.text
     assert ready.json()["checks"]["database"] is True
     assert ready.json()["checks"]["storage"] is True
+
+
+def test_integration_form_crud_test_event_and_retry(auth_client: TestClient) -> None:
+    """Проверить полный lifecycle CSV/Sheets-интеграции и повтор outbox-события."""
+
+    headers = csrf_headers(auth_client)
+    invalid_csv = auth_client.post(
+        "/api/v1/integrations",
+        headers=headers,
+        json={
+            "name": "Invalid CSV",
+            "kind": "csv_export",
+            "config": {"relative_path": "../escape.csv"},
+            "event_types": [],
+        },
+    )
+    assert invalid_csv.status_code == 422
+    invalid_sheets = auth_client.post(
+        "/api/v1/integrations",
+        headers=headers,
+        json={
+            "name": "Invalid Sheets",
+            "kind": "google_sheets",
+            "config": {"spreadsheet_id": "sheet-only"},
+            "event_types": [],
+        },
+    )
+    assert invalid_sheets.status_code == 422
+
+    created = auth_client.post(
+        "/api/v1/integrations",
+        headers=headers,
+        json={
+            "name": "Audit CSV",
+            "kind": "csv_export",
+            "config": {"relative_path": "integrations/audit.csv"},
+            "event_types": ["candidate.updated"],
+            "is_active": False,
+        },
+    )
+    assert created.status_code == 201, created.text
+    endpoint_id = created.json()["id"]
+    listed = auth_client.get("/api/v1/integrations")
+    assert listed.status_code == 200 and listed.json()[0]["id"] == endpoint_id
+
+    patched = auth_client.patch(
+        f"/api/v1/integrations/{endpoint_id}",
+        headers=headers,
+        json={
+            "name": "Audit CSV updated",
+            "config": {"relative_path": "integrations/audit-updated.csv"},
+            "event_types": ["candidate.updated", "integration.test"],
+            "is_active": True,
+        },
+    )
+    assert patched.status_code == 200, patched.text
+    assert patched.json()["name"] == "Audit CSV updated"
+
+    tested = auth_client.post(f"/api/v1/integrations/{endpoint_id}/test", headers=headers)
+    assert tested.status_code == 200, tested.text
+    event_id = tested.json()["id"]
+    events = auth_client.get(
+        "/api/v1/integrations/outbox/events", params={"status_filter": "pending", "limit": 1}
+    )
+    assert events.status_code == 200 and events.json()[0]["id"] == event_id
+    not_retryable = auth_client.post(
+        f"/api/v1/integrations/outbox/{event_id}/retry", headers=headers
+    )
+    assert not_retryable.status_code == 409
+
+    with auth_client.app.state.session_factory() as db:
+        event = db.get(OutboxEvent, event_id)
+        assert event is not None
+        event.status = OutboxStatus.FAILED
+        event.last_error_message = "synthetic failure"
+        event.locked_at = utcnow()
+        event.locked_by = "dead-worker"
+        db.commit()
+    retried = auth_client.post(f"/api/v1/integrations/outbox/{event_id}/retry", headers=headers)
+    assert retried.status_code == 200, retried.text
+    assert retried.json()["status"] == "retry"
+    assert retried.json()["last_error_message"] is None
+
+    deleted = auth_client.delete(f"/api/v1/integrations/{endpoint_id}", headers=headers)
+    assert deleted.status_code == 200
+    assert (
+        auth_client.patch(
+            f"/api/v1/integrations/{endpoint_id}", headers=headers, json={"name": "Gone"}
+        ).status_code
+        == 404
+    )

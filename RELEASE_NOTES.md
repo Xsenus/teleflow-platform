@@ -5,7 +5,9 @@
 - Сквозной Windows/Linux-ready QA, строгая типизация и русскоязычная документация функций.
 - Исправления recovery SQLite lifecycle и доступности динамических форм.
 - Responsive browser acceptance для всех 32 разделов.
-- 301 тест, 80,41% statement coverage и gate 80%; оптимизированные изолированные фикстуры.
+- 331 тест, 83,22% statement coverage и gate 80%; оптимизированные изолированные фикстуры.
+- Полные API lifecycle-тесты диалогов, кандидатов, автоматизации, интеграций и шаблонов.
+- Изолированные contract-тесты Telegram Bot API, OpenAI-compatible adapter, media validation и Redis-locks.
 - GitHub CI/CodeQL/Dependabot, шаблоны сопровождения и проверяемый source manifest.
 
 ## 2.5.0 — 2026-08-09
