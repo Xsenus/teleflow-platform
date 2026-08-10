@@ -560,7 +560,7 @@ TELEFLOW_CLAMAV_TIMEOUT_SECONDS=8
 
 - Python compileall;
 - JavaScript syntax-check основного UI и service worker;
-- 447 тестов в 55 функциональных модулях; итоговое statement coverage 88,32% при обязательном `--fail-under=80`;
+- 458 тестов в 57 функциональных модулях; итоговое statement coverage 88,82% при обязательном `--fail-under=80`;
 - static release-asset validation: version markers, Compose YAML, JSON, локальные ссылки и запрещённые файлы;
 - `alembic upgrade head`, `alembic check`, downgrade 2.5→2.4 и повторный upgrade;
 - проверку audit chain и dry-run ротации master key;

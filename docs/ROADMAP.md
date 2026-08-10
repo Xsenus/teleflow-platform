@@ -88,7 +88,7 @@ TeleFlow **не реализует** обход антиспама, подбор
 | Continuity assurance | Simulation без сети, live failover/failback, runtime compatibility, RTO, event-chain и independent sign-off | Готово; фактический двуххостовый drill требует инфраструктуру владельца |
 | Capacity assurance | Admission, ready-release, dispatch reservations, rate budgets, drain forecast и immutable assessments | Готово; production thresholds требуют load-test владельца |
 | Incident assurance | Lifecycle, immutable event history, automatic SLO incidents и audit | Готово |
-| QA | 447 тестов, coverage 88,32% при gate 80%, русская documentation gate, Linux/Windows CI, migration/HTTP/worker/audit/recovery/capacity/continuity gates | Готово |
+| QA | 458 тестов, coverage 88,82% при gate 80%, русская documentation gate, Linux/Windows CI, migration/HTTP/worker/audit/recovery/capacity/continuity gates | Готово |
 
 ## 3. Этап 0 — анализ и безопасные границы
 
