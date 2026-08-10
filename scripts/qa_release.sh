@@ -125,6 +125,7 @@ run_test_group core \
   tests/test_auth_security.py \
   tests/test_automation_admin_api.py \
   tests/test_automation_flows.py \
+  tests/test_flow_engine_edges.py \
   tests/test_business_admin_api.py \
   tests/test_business_automation.py \
   tests/test_business_client.py \
@@ -142,6 +143,7 @@ run_test_group publisher1 \
   tests/test_campaign_api_edges.py \
   tests/test_campaign_variants.py \
   tests/test_config_migrations.py \
+  tests/test_scheduler_service_edges.py \
   tests/test_scheduler_occurrences.py
 run_test_group publisher2 \
   tests/test_crypto_totp.py \
