@@ -185,7 +185,8 @@ run_test_group artifact \
   tests/test_artifact_verifier_edges.py
 run_test_group recovery \
   tests/test_recovery_assurance.py \
-  tests/test_recovery_api_admin.py
+  tests/test_recovery_api_admin.py \
+  tests/test_operations_recovery_api_edges.py
 run_test_group security1 \
   tests/test_hardening.py \
   tests/test_multitenancy_integrations.py \
@@ -200,11 +201,13 @@ run_test_group security2 \
   tests/test_transport_adapters.py \
   tests/test_worker_orchestration.py
 run_test_group operations \
-  tests/test_operations_slo.py
+  tests/test_operations_slo.py \
+  tests/test_operations_service_edges.py
 run_test_group capacity \
   tests/test_capacity_backpressure.py
 run_test_group execution \
-  tests/test_execution_fencing.py
+  tests/test_execution_fencing.py \
+  tests/test_execution_service_edges.py
 run_test_group continuity \
   tests/test_continuity_assurance.py \
   tests/test_continuity_api_edges.py \
