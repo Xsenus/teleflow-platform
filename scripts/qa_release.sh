@@ -144,7 +144,8 @@ run_test_group publisher1 \
   tests/test_scheduler_occurrences.py
 run_test_group publisher2 \
   tests/test_crypto_totp.py \
-  tests/test_delivery_safety.py
+  tests/test_delivery_safety.py \
+  tests/test_safety_edges.py
 run_test_group publisher3 \
   tests/test_destination_bulk.py
 run_test_group publisher4 \
@@ -152,7 +153,8 @@ run_test_group publisher4 \
 run_test_group finalhardening \
   tests/test_final_hardening.py
 run_test_group governance \
-  tests/test_governance_resilience.py
+  tests/test_governance_resilience.py \
+  tests/test_key_rotation_edges.py
 run_test_group changes1 \
   tests/test_change_management.py \
   tests/test_release_trust.py
@@ -179,7 +181,8 @@ run_test_group recovery \
   tests/test_recovery_api_admin.py
 run_test_group security1 \
   tests/test_hardening.py \
-  tests/test_multitenancy_integrations.py
+  tests/test_multitenancy_integrations.py \
+  tests/test_security_runtime_edges.py
 run_test_group security2 \
   tests/test_distributed_locks.py \
   tests/test_logging_and_factory.py \
@@ -197,6 +200,7 @@ run_test_group execution \
   tests/test_execution_fencing.py
 run_test_group continuity \
   tests/test_continuity_assurance.py \
+  tests/test_continuity_api_edges.py \
   tests/test_function_documentation.py
 
 # Coverage instrumentation can block while appending to an existing data file
