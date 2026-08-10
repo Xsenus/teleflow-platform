@@ -193,7 +193,10 @@ def patch_flow(
     """Обновить flow. Переход применяется только после проверки его предусловий."""
     item = _flow(db, flow_id, user.organization_id)
     values = payload.model_dump(exclude_unset=True)
-    definition = values.pop("definition", None)
+    # Сохраняем валидированную Pydantic-модель: model_dump() рекурсивно
+    # превращает definition в dict, у которого уже нет метода model_dump().
+    definition = payload.definition if "definition" in payload.model_fields_set else None
+    values.pop("definition", None)
     requested_active = values.get("is_active")
     if definition is not None and item.is_active:
         raise HTTPException(
