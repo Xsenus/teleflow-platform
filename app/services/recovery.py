@@ -899,8 +899,8 @@ def _copy_local_storage(source: Path, destination: Path, backups_path: Path) -> 
     total_bytes = 0
     if not source.exists():
         return 0, 0
-    source = source.resolve()
-    backups_path = backups_path.resolve()
+    source = Path(os.path.realpath(source))
+    backups_path = Path(os.path.realpath(backups_path))
     for item in sorted(source.rglob("*")):
         try:
             mode = item.lstat().st_mode
