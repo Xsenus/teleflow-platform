@@ -902,15 +902,18 @@ def _copy_local_storage(source: Path, destination: Path, backups_path: Path) -> 
     source = source.resolve()
     backups_path = backups_path.resolve()
     for item in sorted(source.rglob("*")):
-        resolved = item.resolve()
-        if resolved == backups_path or backups_path in resolved.parents:
-            continue
         try:
             mode = item.lstat().st_mode
         except FileNotFoundError:
             continue
         if stat.S_ISLNK(mode):
             raise RecoveryError(f"Символические ссылки в storage запрещены: {item}")
+        try:
+            resolved = item.resolve()
+        except FileNotFoundError:
+            continue
+        if resolved == backups_path or backups_path in resolved.parents:
+            continue
         if not item.is_file():
             continue
         relative = item.relative_to(source)
