@@ -28,12 +28,43 @@ def candidate_files() -> list[Path]:
     return sorted(paths, key=lambda path: path.as_posix())
 
 
+def file_attributes(paths: list[Path]) -> dict[Path, dict[str, str]]:
+    """Одним вызовом Git получить текстовые атрибуты всех файлов manifest."""
+
+    completed = subprocess.run(
+        ["git", "check-attr", "-z", "--stdin", "text"],
+        cwd=ROOT,
+        check=True,
+        input=b"\0".join(path.as_posix().encode("utf-8") for path in paths) + b"\0",
+        stdout=subprocess.PIPE,
+    )
+    fields = completed.stdout.split(b"\0")
+    attributes: dict[Path, dict[str, str]] = {}
+    for offset in range(0, len(fields) - 1, 3):
+        relative = Path(fields[offset].decode("utf-8"))
+        name = fields[offset + 1].decode("utf-8")
+        value = fields[offset + 2].decode("utf-8")
+        attributes.setdefault(relative, {})[name] = value
+    return attributes
+
+
+def canonical_bytes(relative: Path, attributes: dict[str, str]) -> bytes:
+    """Прочитать файл в каноническом виде с учётом правил `.gitattributes`."""
+
+    payload = (ROOT / relative).read_bytes()
+    if attributes.get("text") != "unset":
+        return payload.replace(b"\r\n", b"\n")
+    return payload
+
+
 def render_manifest() -> str:
     """Вычислить manifest без включения самого файла manifest."""
 
+    paths = candidate_files()
+    attributes = file_attributes(paths)
     lines = []
-    for relative in candidate_files():
-        digest = hashlib.sha256((ROOT / relative).read_bytes()).hexdigest()
+    for relative in paths:
+        digest = hashlib.sha256(canonical_bytes(relative, attributes[relative])).hexdigest()
         lines.append(f"{digest}  {relative.as_posix()}")
     return "\n".join(lines) + "\n"
 
