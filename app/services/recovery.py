@@ -899,8 +899,10 @@ def _copy_local_storage(source: Path, destination: Path, backups_path: Path) -> 
     total_bytes = 0
     if not source.exists():
         return 0, 0
-    source = Path(os.path.realpath(source))
-    backups_path = Path(os.path.realpath(backups_path))
+    source = Path(os.path.abspath(source))
+    backups_path = Path(os.path.abspath(backups_path))
+    if source.is_symlink():
+        raise RecoveryError(f"Символические ссылки для корня storage запрещены: {source}")
     for item in sorted(source.rglob("*")):
         try:
             mode = item.lstat().st_mode
