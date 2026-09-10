@@ -1,12 +1,19 @@
 # Changelog
 
-## Unreleased — audit hardening 2026-08-10
+## Unreleased — интеграция и audit hardening 2026-09-10
+
+- В `main` интегрированы SQLAlchemy 2.0.52, Sentry SDK 2.68.1 и pytest-cov 7.1.
+- Docker Buildx Action обновлён до 4.3.0, Build Push Action — до 7.3.0; все Actions закреплены полными SHA.
+- Устранены межплатформенные расхождения `MANIFEST.sha256` между CRLF checkout Windows и LF checkout Linux.
+- Release QA проверяет nginx на непривилегированных временных портах и совместим с nginx 1.24/1.27.
+- Recovery-копирование корректно обрабатывает исчезающие файлы и запрещённые символические ссылки на Windows и Linux.
+- GitHub CI подтвердил Linux release QA, Windows regression, production Docker build, Ruff, mypy, dependency audit и CodeQL.
 
 - Исправлены UTC-зависимый analytics test и утечки SQLite-соединений recovery-проверки на Windows.
 - Устранены ошибки строгой типизации; Ruff и mypy добавлены в обязательный CI.
 - Динамические формы получили программные связи label/field, включая повторный render flow builder.
 - Выполнена живая проверка 32 SPA-разделов на desktop, tablet и mobile.
-- Все 1 590 Python- и 156 JavaScript-функций защищены русскоязычным documentation gate.
+- Все 2 062 Python- и 156 JavaScript-функций защищены русскоязычным documentation gate.
 - Тестовые БД клонируются из эталона; полный Windows-прогон ускорен примерно на 62%.
 - Coverage gate повышен с 65% до 80%.
 - Добавлены GitHub issue/PR templates, CodeQL, Windows CI, SHA-pinned Actions и Dependabot.

@@ -1,11 +1,17 @@
 # Release notes
 
-## Unreleased — audit hardening 2026-08-10
+## Unreleased — интеграция и audit hardening 2026-09-10
+
+- Все актуальные ветки Dependabot интегрированы в `main` с сохранением истории.
+- Обновлены SQLAlchemy 2.0.52, Sentry SDK 2.68.1 и pytest-cov 7.1.
+- CI использует Docker Buildx Action 4.3.0 и Build Push Action 7.3.0 на Node.js 24.
+- Исправлены кроссплатформенный source manifest, Linux nginx validation и recovery-обработка исчезающих файлов/symlink.
+- Полный GitHub pipeline успешно проверяет Linux, Windows, Docker, миграционный roundtrip, smoke, worker и recovery.
 
 - Сквозной Windows/Linux-ready QA, строгая типизация и русскоязычная документация функций.
 - Исправления recovery SQLite lifecycle и доступности динамических форм.
 - Responsive browser acceptance для всех 32 разделов.
-- 407 тестов, 87,04% statement coverage и gate 80%; оптимизированные изолированные фикстуры.
+- 841 тест, 95,51% statement coverage и gate 80%; оптимизированные изолированные фикстуры.
 - Полные API lifecycle-тесты диалогов, кандидатов, автоматизации, интеграций и шаблонов.
 - Изолированные contract-тесты Telegram Bot API, OpenAI-compatible adapter, media validation и Redis-locks.
 - Полная mock-проверка MTProto/2FA, worker orchestration, Business client и External API.

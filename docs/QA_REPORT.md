@@ -57,6 +57,12 @@ python-multipart 0.0.31. Полная Windows-матрица на обновлё
 GitHub Actions checkout/setup-python/setup-node обновлены до SHA-pinned Node.js 24-совместимых
 версий; Linux release-QA вызывается через `sh`, а executable bit скрипта хранится в Git.
 
+Интеграционный прогон 10 сентября 2026 года дополнительно подтвердил SQLAlchemy 2.0.52,
+Sentry SDK 2.68.1, pytest-cov 7.1, Docker Buildx Action 4.3.0 и Build Push Action 7.3.0.
+На публичной ветке `main` успешно завершились Linux release QA, Windows regression,
+production Docker build, dependency audit и CodeQL. В Linux QA также подтверждены полный
+миграционный roundtrip, HTTP smoke, worker-once и recovery smoke.
+
 Отдельный inbound lifecycle-пакет проверяет idempotency и конкурентную unique-гонку, повторное
 подключение Telegram Business, позднее назначение automation policy существующему диалогу,
 редактирование и удаление сообщений, consent/rate/daily-cap ограничения, AI fallback/handoff и
