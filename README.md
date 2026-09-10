@@ -1,12 +1,33 @@
-# TeleFlow Platform 2.5
+# TeleFlow Platform
 
-## 2.5.0 — Capacity & Backpressure Assurance
+[![CI](https://github.com/Xsenus/teleflow-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/Xsenus/teleflow-platform/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/Xsenus/teleflow-platform/actions/workflows/codeql.yml/badge.svg)](https://github.com/Xsenus/teleflow-platform/actions/workflows/codeql.yml)
+![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)
+![Release](https://img.shields.io/badge/release-2.5.0-0F766E)
 
-Версия **2.5.0** добавляет tenant-level admission control, durable dispatch reservation, minute/hour budgets и прогноз времени обработки очереди. Проверки выполняются до создания массовых jobs, при раскрытии staged batches и непосредственно перед Telegram gateway. Подробности: [docs/CAPACITY_ASSURANCE.md](docs/CAPACITY_ASSURANCE.md).
+Self-hosted платформа для контролируемых Telegram-публикаций, обработки обращений Telegram
+Business и квалификации кандидатов. Она объединяет официальный Bot API, отдельный MTProto-
+аккаунт, безопасную очередь, визуальные сценарии, аналитику, AI-автоматизацию, интеграции,
+аудит и управление персональными данными.
 
-TeleFlow Platform — self-hosted веб-система для управляемых Telegram-публикаций, обработки входящих обращений Telegram Business и квалификации кандидатов. Платформа объединяет официальный Bot API, отдельный пользовательский MTProto-аккаунт, безопасную очередь, визуальные сценарии, аналитику, AI-автоматизацию, интеграции, аудит и управление персональными данными.
+Актуальный релиз — **2.5.0 (Capacity & Backpressure Assurance)**. Он добавляет tenant-level
+admission control, durable dispatch reservations, minute/hour budgets и прогноз обработки
+очереди. Проверки выполняются до создания массовых jobs, при раскрытии staged batches и
+непосредственно перед Telegram gateway.
 
 > Платформа предназначена только для групп, каналов и тем, где публикация разрешена правилами или администраторами. В ней нет автоматического вступления в группы, массовых личных сообщений, ротации аккаунтов/прокси, маскировки автоматизации и обхода ограничений Telegram.
+
+## Быстрые ссылки
+
+- [Локальный запуск](#быстрый-локальный-запуск-без-внешнего-telegram)
+- [Docker Compose](#docker-compose)
+- [Подключение Telegram](#подключение-telegram)
+- [Архитектура](docs/ARCHITECTURE.md)
+- [Развёртывание](docs/DEPLOYMENT.md)
+- [API](docs/API.md)
+- [Безопасность](SECURITY.md)
+- [Результаты QA](docs/QA_REPORT.md)
+- [Участие в разработке](CONTRIBUTING.md)
 
 ## Статус релиза
 
@@ -573,7 +594,7 @@ TELEFLOW_CLAMAV_TIMEOUT_SECONDS=8
 - execution fencing, durable network-attempt ledger, controlled failover и continuity/failback gates;
 - Ruff, mypy и `pip-audit` dependency gate;
 - проверяемый `MANIFEST.sha256` для текущего Git-дерева;
-- обязательный русскоязычный docstring/JSDoc gate для 1 590 Python- и 156 JavaScript-функций.
+- обязательный русскоязычный docstring/JSDoc gate для 2 060 Python- и 156 JavaScript-функций.
 
 Дополнительно:
 
@@ -630,3 +651,9 @@ commit SHA, а Dependabot отслеживает Python, Docker и Actions.
 ## Честные внешние границы приёмки
 
 Репозиторий содержит adapters, fake transport и интеграционные тесты, но реальные вызовы Telegram Bot API, MTProto, Telegram Business, внешнего AI, Google Sheets, S3 и ClamAV требуют credentials и инфраструктуры владельца. Секреты намеренно не входят в исходный код или архив. До production необходимо пройти live-пилот и зафиксировать фактические Telegram message IDs, webhook update IDs, права групп и результаты backup restore drill.
+
+## Лицензия
+
+Исходный код опубликован для просмотра, аудита и совместной работы, но остаётся проприетарным.
+Публичная доступность репозитория сама по себе не предоставляет право копировать, изменять или
+распространять проект. Условия приведены в [LICENSE](LICENSE).
