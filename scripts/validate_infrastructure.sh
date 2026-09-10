@@ -20,7 +20,9 @@ mkdir -p \
 
 # The Docker config normally resolves `api` through Compose DNS. Use localhost
 # only for an isolated syntax check in a temporary nginx prefix.
-sed 's/server api:8080;/server 127.0.0.1:8080;/' \
+sed \
+  -e 's/server api:8080;/server 127.0.0.1:8080;/' \
+  -e 's/listen 80;/listen 18080;/' \
   "$ROOT/deploy/nginx/default.conf" >"$TMP/nginx-default/conf.d/default.conf"
 cat >"$TMP/nginx-default/nginx.conf" <<NGINX
 pid $TMP/nginx-default/nginx.pid;
@@ -43,6 +45,8 @@ openssl req -x509 -newkey rsa:2048 -nodes \
 sed \
   -e "s#/etc/letsencrypt/live/panel.example.com/fullchain.pem#$TMP/nginx-https/cert.pem#" \
   -e "s#/etc/letsencrypt/live/panel.example.com/privkey.pem#$TMP/nginx-https/key.pem#" \
+  -e 's/listen 80;/listen 18080;/' \
+  -e 's/listen 443 ssl;/listen 18443 ssl;/' \
   "$ROOT/deploy/nginx/teleflow-https.example.conf" \
   >"$TMP/nginx-https/conf.d/default.conf"
 cat >"$TMP/nginx-https/nginx.conf" <<NGINX
