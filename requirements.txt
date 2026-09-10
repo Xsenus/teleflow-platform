@@ -8,7 +8,7 @@ pydantic-settings==2.14.2
 psycopg[binary]>=3.2,<4
 PyJWT[crypto]==2.13.0
 argon2-cffi==25.1.0
-cryptography==50.0.0
+cryptography==50.0.1
 httpx==0.28.1
 python-multipart==0.0.31
 email-validator==2.3.0
