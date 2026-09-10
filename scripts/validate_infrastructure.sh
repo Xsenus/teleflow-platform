@@ -25,9 +25,11 @@ sed 's/server api:8080;/server 127.0.0.1:8080;/' \
 cat >"$TMP/nginx-default/nginx.conf" <<NGINX
 pid $TMP/nginx-default/nginx.pid;
 error_log $TMP/nginx-default/error.log;
-access_log $TMP/nginx-default/access.log;
 events {}
-http { include $TMP/nginx-default/conf.d/*.conf; }
+http {
+  access_log $TMP/nginx-default/access.log;
+  include $TMP/nginx-default/conf.d/*.conf;
+}
 NGINX
 nginx -t -p "$TMP/nginx-default" -c "$TMP/nginx-default/nginx.conf"
 
@@ -46,9 +48,11 @@ sed \
 cat >"$TMP/nginx-https/nginx.conf" <<NGINX
 pid $TMP/nginx-https/nginx.pid;
 error_log $TMP/nginx-https/error.log;
-access_log $TMP/nginx-https/access.log;
 events {}
-http { include $TMP/nginx-https/conf.d/*.conf; }
+http {
+  access_log $TMP/nginx-https/access.log;
+  include $TMP/nginx-https/conf.d/*.conf;
+}
 NGINX
 nginx -t -p "$TMP/nginx-https" -c "$TMP/nginx-https/nginx.conf"
 
