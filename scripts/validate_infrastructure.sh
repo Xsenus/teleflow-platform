@@ -46,7 +46,7 @@ sed \
   -e "s#/etc/letsencrypt/live/panel.example.com/fullchain.pem#$TMP/nginx-https/cert.pem#" \
   -e "s#/etc/letsencrypt/live/panel.example.com/privkey.pem#$TMP/nginx-https/key.pem#" \
   -e 's/listen 80;/listen 18080;/' \
-  -e 's/listen 443 ssl;/listen 18443 ssl;/' \
+  -e 's/listen 443 ssl http2;/listen 18443 ssl http2;/' \
   "$ROOT/deploy/nginx/teleflow-https.example.conf" \
   >"$TMP/nginx-https/conf.d/default.conf"
 cat >"$TMP/nginx-https/nginx.conf" <<NGINX
