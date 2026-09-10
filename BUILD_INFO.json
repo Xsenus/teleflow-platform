@@ -50,8 +50,8 @@
     "docker_ci_job": "configured",
     "ruff": "passed",
     "mypy": "passed: 111 production source files",
-    "dependency_vulnerability_audit": "pip-audit 2.10.1 configured in CI; local advisory API timed out twice, pip check passed",
-    "github_actions_supply_chain": "all workflow actions pinned to full commit SHA; Dependabot enabled",
+    "dependency_vulnerability_audit": "GitHub CI advisory findings remediated: FastAPI 0.141.1, Starlette 1.3.1, pydantic-settings 2.14.2, cryptography 50.0.0 and python-multipart 0.0.31; pip-audit remains a required CI gate",
+    "github_actions_supply_chain": "all workflow actions pinned to full commit SHA; checkout/setup-python/setup-node upgraded to Node.js 24-compatible major releases; Dependabot enabled",
     "coverage_note": "Current local tree: 841 collected, 839 passed, 2 Windows Unix-only skips; 18,001 production statements, 808 missed, 95.51%. Coverage combines the verified full baseline with 1,144.8 seconds of isolated branch runs; recovery, continuity, operations, execution, recovery API, delivery, automation API, flows, scheduler, privacy, destination API, destination bulk, inbound, supply-chain, configuration bundles, continuity API, media API, middleware, dependencies, URL security, Safety Engine and key rotation are at 100%; Linux release-QA rebuilds coverage in 21 shards.",
     "test_optimization": "initialized SQLite template cloning completed the expanded 841-test Windows run (except the separately verified manifest check) in 351.8 seconds; security and lifecycle edge suites use deterministic unit doubles and synthetic archives for pure error and concurrency branches"
   },

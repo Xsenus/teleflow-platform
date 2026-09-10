@@ -51,6 +51,12 @@ JavaScript named functions:    156
 
 ## Новые алгоритмические проверки 2.5
 
+После первой публикации GitHub CI обновлены зависимости с исправлениями advisory:
+FastAPI 0.141.1, Starlette 1.3.1, pydantic-settings 2.14.2, cryptography 50.0.0 и
+python-multipart 0.0.31. Полная Windows-матрица на обновлённом стеке прошла без ошибок.
+GitHub Actions checkout/setup-python/setup-node обновлены до SHA-pinned Node.js 24-совместимых
+версий; Linux release-QA вызывается через `sh`, а executable bit скрипта хранится в Git.
+
 Отдельный inbound lifecycle-пакет проверяет idempotency и конкурентную unique-гонку, повторное
 подключение Telegram Business, позднее назначение automation policy существующему диалогу,
 редактирование и удаление сообщений, consent/rate/daily-cap ограничения, AI fallback/handoff и
