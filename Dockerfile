@@ -1,4 +1,4 @@
-FROM python:3.12-slim AS runtime
+FROM python:3.14-slim AS runtime
 
 LABEL org.opencontainers.image.title="TeleFlow Platform" \
       org.opencontainers.image.version="2.5.0" \
