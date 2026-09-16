@@ -86,6 +86,18 @@ def test_github_workflows_and_templates_are_release_ready() -> None:
     assert (root / "SECURITY.md").is_file()
     assert (root / "CONTRIBUTING.md").is_file()
 
+    dependabot = yaml.safe_load((root / ".github" / "dependabot.yml").read_text(encoding="utf-8"))
+    updates = dependabot["updates"]
+    assert {item["package-ecosystem"] for item in updates} == {
+        "pip",
+        "docker",
+        "github-actions",
+    }
+    for update in updates:
+        group = update["groups"]["compatible-updates"]
+        assert group["patterns"] == ["*"]
+        assert set(group["update-types"]) == {"minor", "patch"}
+
 
 def _hardened_production(**overrides: object) -> Settings:
     """Реализовать внутренний этап hardened production step. Вспомогательная функция сохраняет
